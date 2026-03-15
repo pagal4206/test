@@ -1,65 +1,85 @@
 # Telegram Force-Sub Bot (TeleBot + MongoDB)
 
-Yeh bot har group ke liye alag force-sub settings chalata hai (MongoDB me save hoti hain).  
-By default koi built-in channel set nahi hota.
+This bot supports per-group force-sub settings stored in MongoDB.
+There is no built-in default channel; each group admin sets it manually.
 
 ## Features
-- Group-wise force-sub config (on/off per group).
-- Non-joined users ke messages delete + warning.
-- Join button support (`Join Channel`).
-- MongoDB tracking:
-  - Private `/start` users
-  - Active groups
-  - Har group ka force-sub config
-- Admin panel commands:
-  - `/stats`
-  - `/broadcast`
+- Per-group force-sub configuration.
+- Deletes messages from users who are not subscribed to the required channel.
+- Sends a warning with an optional `Join Channel` button.
+- Stores private users (`/start`) and groups in MongoDB.
+- Admin tools: `/stats`, `/broadcast`.
+- Group control with `/bot on` and `/bot off`.
+- Built-in `/help` command with command usage guide.
 
 ## Setup
-1. Python 3.10+ install karo.
-2. Dependencies:
+1. Install Python 3.10+.
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-3. Env file banao:
+3. Create the env file:
    ```bash
    copy .env.example .env
    ```
-4. `.env` me values set karo:
+4. Configure `.env`:
    - `BOT_TOKEN`: BotFather token
    - `MONGO_URI`: MongoDB connection string
-   - `MONGO_DB_NAME`: DB name
-   - `ADMIN_IDS`: comma-separated Telegram user IDs (`/stats` aur `/broadcast` ke liye)
+   - `MONGO_DB_NAME`: Database name
+   - `ADMIN_IDS`: Comma-separated Telegram user IDs (for `/stats` and `/broadcast`)
 
 ## Run
 ```bash
 python bot.py
 ```
 
-## Telegram Permissions (Important)
-- Bot ko group me admin banao.
-- Group me bot ko `Delete messages` permission do.
-- Jis channel ka sub-check karna hai, bot ko us channel me add/admin karna best hai.
+## Project Structure
+```text
+forcesub/
+|-- bot.py
+|-- app/
+|   |-- bot_factory.py
+|   |-- config.py
+|   |-- context.py
+|   |-- constants.py
+|   |-- database.py
+|   |-- models.py
+|   |-- handlers/
+|   |-- services/
+|   |-- repositories/
+|   `-- helpers/
+|-- requirements.txt
+`-- .env.example
+```
+
+## Required Telegram Permissions
+- Make the bot an admin in each group where force-sub is enabled.
+- Enable `Delete messages` permission for the bot in those groups.
+- Add the bot to the required channel (admin recommended) so membership checks can work.
 
 ## Group Commands (Group Admin Only)
 - `/fsub <channel_id/@username/link>`
-  - Is group ka force-sub channel set karta hai.
+  - Sets the required force-sub channel for the current group.
 - `/fsub <channel_id/@username> <join_link>`
-  - Membership check ke liye channel_ref + button ke liye custom join link set karta hai.
+  - Sets channel reference plus a custom join link button.
 - `/fsub off`
-  - Is group ka force-sub channel clear + force-sub off.
+  - Clears channel config and turns force-sub off.
 - `/bot on`
-  - Is group me force-sub enable.
+  - Enables force-sub in current group.
 - `/bot off`
-  - Is group me force-sub disable.
+  - Disables force-sub in current group.
 - `/bot`
-  - Current group status show karta hai.
+  - Shows current force-sub status for current group.
+- `/help`
+  - Shows full command list and usage.
 
 ## Global Commands
-- `/start` (private): user ko DB me add karta hai.
-- `/stats` (bot admin only): active users + groups count.
-- `/broadcast <message>` (bot admin only): sab active users + groups ko message bhejta hai.
+- `/start` (private): Saves the user in database.
+- `/stats` (bot admin only): Shows active user and group counts.
+- `/broadcast <message>` (bot admin only): Sends text to all active users and groups.
+- Reply to any message (text/photo/video/sticker/document/voice/etc) and send `/broadcast`:
+  - The bot copies that message to all active users and groups.
 
 ## Notes
-- Agar sirf private invite link (`https://t.me/+...`) set kiya gaya ho, to membership verify nahi ho sakti.
-- Proper force-sub ke liye `channel_id` ya `@username` dena zaroori hai.
+- An invite-only link (`https://t.me/+...`) alone is not enough for membership verification.
+- For strict enforcement, set `channel_id` or `@username`.
