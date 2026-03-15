@@ -1,101 +1,65 @@
-<p align="center"><a href="https://dashboard.heroku.com/new?template=https://github.com/pagal4206/test"> <img src="https://img.shields.io/badge/Deploy%20On%20Heroku-bringle?style=for-the-badge&logo=heroku" width="220" height="38.45"/></a></p>
-<html lang="en">
-<body>
+# Telegram Force-Sub Bot (TeleBot + MongoDB)
 
-<h1>Force Sub Bot</h1>
+Yeh bot har group ke liye alag force-sub settings chalata hai (MongoDB me save hoti hain).  
+By default koi built-in channel set nahi hota.
 
-<section>
-<div align="center">
-<a href="https://github.com/Abishnoi69/Force-Sub-Bot/actions?query=workflow%3Abuild+event%3Apush+branch%3Amain"><img src="https://github.com/Abishnoi69/Force-Sub-Bot/workflows/build/badge.svg" alt="build"></a>
-<a href="https://goreportcard.com/report/Abishnoi69/Force-Sub-Bot"><img src="https://goreportcard.com/badge/Abishnoi69/Force-Sub-Bot" alt="Go Report Card"></a>
-<a href="https://github.com/Abishnoi69/Force-Sub-Bot/blob/main/go.mod"><img src="https://img.shields.io/github/go-mod/go-version/Abishnoi69/Force-Sub-Bot?logo=go" alt="Go Version"></a>
-</div>
-</section>
+## Features
+- Group-wise force-sub config (on/off per group).
+- Non-joined users ke messages delete + warning.
+- Join button support (`Join Channel`).
+- MongoDB tracking:
+  - Private `/start` users
+  - Active groups
+  - Har group ka force-sub config
+- Admin panel commands:
+  - `/stats`
+  - `/broadcast`
 
+## Setup
+1. Python 3.10+ install karo.
+2. Dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Env file banao:
+   ```bash
+   copy .env.example .env
+   ```
+4. `.env` me values set karo:
+   - `BOT_TOKEN`: BotFather token
+   - `MONGO_URI`: MongoDB connection string
+   - `MONGO_DB_NAME`: DB name
+   - `ADMIN_IDS`: comma-separated Telegram user IDs (`/stats` aur `/broadcast` ke liye)
 
-<p>This project includes a Telegram bot designed to enforce subscription to a specific channel before allowing users to interact in a group chat. It's built using <a href="https://go.dev">Go</a> and integrates with the Telegram Bot API using <a href="https://github.com/PaulSonOfLars/gotgbot">gotgbot</a>.</p>
-
-<section>
-<h2>Installation Instructions</h2>
-<h3>Install Go</h3>
-<ol>
-
-```shell
-git clone https://github.com/udhos/update-golang dlgo && cd dlgo && sudo ./update-golang.sh && source /etc/profile.d/golang_path.sh
+## Run
+```bash
+python bot.py
 ```
 
-<li>Exit and reopen your terminal, then verify the installation with <code>go version</code>.</li>
-</ol>
+## Telegram Permissions (Important)
+- Bot ko group me admin banao.
+- Group me bot ko `Delete messages` permission do.
+- Jis channel ka sub-check karna hai, bot ko us channel me add/admin karna best hai.
 
-<h3>Set Up the Project</h3>
-<ol>
-<li>Clone the repository:
-<pre><code>git clone https://github.com/Abishnoi69/Force-Sub-Bot fSub && cd fSub</code></pre>
-</li>
-<li>Prepare the environment file:
-<ol>
-<li>Copy the sample environment file: <code>cp sample.env .env</code></li>
-<li>Open env: <code>vi .env</code></li>
+## Group Commands (Group Admin Only)
+- `/fsub <channel_id/@username/link>`
+  - Is group ka force-sub channel set karta hai.
+- `/fsub <channel_id/@username> <join_link>`
+  - Membership check ke liye channel_ref + button ke liye custom join link set karta hai.
+- `/fsub off`
+  - Is group ka force-sub channel clear + force-sub off.
+- `/bot on`
+  - Is group me force-sub enable.
+- `/bot off`
+  - Is group me force-sub disable.
+- `/bot`
+  - Current group status show karta hai.
 
-<li>Edit the <code>.env</code> file with your preferred editor. Instructions for editing in <code>vi</code>:
-<ul>
-<li>Press <code>ɪ</code> to start editing.</li>
-<li>Press <code>Ctrl + C</code> once editing is complete, then type <code>:wq</code> to save and exit, or <code>:qa</code> to exit without saving.</li>
-</ul>
-</li>
-</ol>
-</li>
-<li>Start a new <code>tmux</code> session: <code>sudo apt install tmux && tmux</code></li>
-<li>Run the bot: <code>go run .</code></li>
-</ol>
-</section>
+## Global Commands
+- `/start` (private): user ko DB me add karta hai.
+- `/stats` (bot admin only): active users + groups count.
+- `/broadcast <message>` (bot admin only): sab active users + groups ko message bhejta hai.
 
-<section>
-<h2>Deploy to Vercel</h2>
-<ol>
-<li>Fork this repository 🍴</li>
-<li>Login your <a href="https://vercel.com/">Vercel</a> account </li>
-<li>Go to your <a href="https://vercel.com/new">Add New Project</a></li>
-<li>Choose the repository you forked</li>
-<li>Configure the environment variables: <code>DB_URI</code> <a href="https://app.redislabs.com/">Redis</a></li>
-<li>Tap on Deploy</li>
-</ol>
-</section>
-
-<section>
-<h2>Usage</h2>
-<p>Once the bot is running, it will enforce subscription to a specific channel before allowing users to interact in the group chat. Users not subscribed to the channel will be prompted to do so.</p>
-
-<h3>Commands</h3>
-<ul>
-<li><code>/start</code> - Start the bot.</li>
-<li><code>/fsub</code> - Set the channel for force subscription. Reply to a forwarded message from the channel you wish to set.</li>
-<li><code>/fsub on</code> - Enable force subscription mode.</li>
-<li><code>/fsub off</code> - Disable force subscription mode.</li>
-<li><code>/fsub</code> - Get the current force subscription status.</li>
-
-<h4>Owner Only Commands</h4>
-<li><code>/getChats</code> - Get all chats.</li>
-<li><code>/getUsers</code> - Get all users who started in private.</li>
-<li><code>/getAllBots</code> - Get all bots running on webhook.</li>
-</ul>
-</section>
-
-<section>
-<h3>License</h3>
-<p>Feel free to visit <a href="LICENSE">LICENSE</a> for more details.</p>
-</section>
-
-<section>
-<h3>Contributing Guidelines</h3>
-<p>Contributions are welcome! For bug reports, feature requests, or pull requests, please open an issue or submit your changes directly.</p>
-</section>
-
-<section>
-<h3>Support</h3>
-<p>For any questions or concerns, please contact me at <a href="https://t.me/Abishnoi1M">Telegram</a>.</p>
-<p><a href="https://t.me/FallenAssociation">FallenAssociation</a></p>
-</section>
-
-</body>
-</html>
+## Notes
+- Agar sirf private invite link (`https://t.me/+...`) set kiya gaya ho, to membership verify nahi ho sakti.
+- Proper force-sub ke liye `channel_id` ya `@username` dena zaroori hai.
